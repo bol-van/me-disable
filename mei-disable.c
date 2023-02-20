@@ -1,13 +1,20 @@
 #include <stdio.h>
+#include <string.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <sys/ioctl.h>
 #include <linux/mei.h>
 #include <unistd.h>
+#include <errno.h>
 
 // Disable Intel ME engine.
 // This was tested on Z87 board.
 // Payload data taken from reverse-engineered fpt.exe v9.5.
+
+
+#define _countof(a) (sizeof(a)/sizeof(*(a)))
+
+static const char *DEV_NAME[] = { "/dev/mei", "/dev/mei0", "/dev/mei1", "/dev/mei2" };
 
 struct guid
 {
@@ -24,8 +31,6 @@ static const struct guid mkhi_guid = {
 	{0x88, 0xEF, 0x9E, 0x39, 0xC6, 0xF6, 0x3E, 0x0F}
 };
 
-static const char *DEV_NAME = "/dev/mei";
-
 uint8_t disable_cmd[] = {0xff,0x10,0x00,0x00};
 
 int main(int argc, char *argv[])
@@ -35,13 +40,20 @@ int main(int argc, char *argv[])
 	int i;
 	struct mei_connect_client_data meidata;
 
-	printf("Opening %s ... ",DEV_NAME);
-	fd = open(DEV_NAME, O_RDWR);
-	if (fd < 0) {
-		printf("error\n"); fflush(stdout);
-		perror("mei device open");
-		return 1;
+	for(int i=0;i<_countof(DEV_NAME);i++)
+	{
+	    printf("Opening %s ... ",DEV_NAME[i]);
+	    fd = open(DEV_NAME[i], O_RDWR);
+	    if (fd < 0) {
+		printf("%s\n", strerror(errno));
+	    }
 	}
+	if (fd<0)
+	{
+	    printf("ME device not found\n");
+	    return 1;
+	}
+
 	printf("opened\n");
 
 	memcpy(&meidata.in_client_uuid,&mkhi_guid,sizeof(mkhi_guid));
