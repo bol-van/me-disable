@@ -24,7 +24,7 @@ static const struct guid mkhi_guid = {
 	{0x88, 0xEF, 0x9E, 0x39, 0xC6, 0xF6, 0x3E, 0x0F}
 };
 
-static const char *DEV_NAME = "/dev/mei";
+static const char *DEV_NAME = "/dev/mei0";
 
 uint8_t disable_cmd[] = {0xff,0x10,0x00,0x00};
 
