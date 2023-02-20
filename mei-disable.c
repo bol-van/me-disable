@@ -32,7 +32,7 @@ static const struct guid mkhi_guid = {
 uint8_t disable_cmd[] = {0xff,0x10,0x00,0x00};
 
 #define NUM_DEV_NAMES 5
-char *DEF_DEV_NAMES[NUM_DEV_NAMES] = {"mei0", "mei", "mei1", "mei2", "mei3"};
+char *DEF_DEV_NAMES[NUM_DEV_NAMES] = {"/dev/mei0", "/dev/mei", "/dev/mei1", "/dev/mei2", "/dev/mei3"};
 
 char *imeCheck() {
     char *dev_name = NULL;
@@ -40,7 +40,7 @@ char *imeCheck() {
 
     for (int i = 0; i < NUM_DEV_NAMES; i++) {
         char path[20];
-        snprintf(path, sizeof(path), "/dev/%s", DEF_DEV_NAMES[i]);
+        snprintf(path, sizeof(path), "%s", DEF_DEV_NAMES[i]);
 
         if (stat(path, &st) == 0) {
             dev_name = DEF_DEV_NAMES[i];
