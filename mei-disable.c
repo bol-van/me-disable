@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
 	int rc;
 	int i;
 	struct mei_connect_client_data meidata;
-	imeCheck(); //new IME device checker, auto-checks for ime device from array.
-	char *DEV_NAME = printf("Opening %s ... ",DEV_NAME);
+	char *DEV_NAME = imeCheck();
+	printf("Opening %s ... ", DEV_NAME);
 	fd = open(DEV_NAME, O_RDWR);
 	if (fd < 0) {
 		printf("error\n"); fflush(stdout);
