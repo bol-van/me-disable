@@ -49,10 +49,10 @@ char *imeCheck() {
     }
 
     if (dev_name == NULL) {
-        perror("device not found");
+        perror("ME Device not found.\n");
         exit(1);
     }
-
+    printf("Found ME device!\n");
     return dev_name;
 }
 
