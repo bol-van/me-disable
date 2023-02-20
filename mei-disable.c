@@ -4,10 +4,16 @@
 #include <sys/ioctl.h>
 #include <linux/mei.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 
 // Disable Intel ME engine.
 // This was tested on Z87 board.
 // Payload data taken from reverse-engineered fpt.exe v9.5.
+
+#define NUM_DEV_NAMES
+char *DEF_DEV_NAMES[NUM_DEV_NAMES] = {"/dev/mei0", "/dev/mei", "/dev/mei1", "/dev/mei2", "/dev/mei3"};
 
 struct guid
 {
@@ -24,9 +30,32 @@ static const struct guid mkhi_guid = {
 	{0x88, 0xEF, 0x9E, 0x39, 0xC6, 0xF6, 0x3E, 0x0F}
 };
 
-static const char *DEV_NAME = "/dev/mei0";
+char *DEV_NAME = NULL;
 
 uint8_t disable_cmd[] = {0xff,0x10,0x00,0x00};
+
+int imeCheck() {
+    struct stat st;
+
+    for (int i = 0; i < NUM_DEV_NAMES; i++) {
+        char path[20];
+        snprintf(path, sizeof(path), "%s", DEF_DEV_NAMES[i]);
+
+        if (stat(path, &st) == 0) {
+            DEV_NAME = DEF_DEV_NAMES[i];
+            break;
+        }
+    }
+
+    if (DEV_NAME == NULL) {
+        perror("ME device not found");
+        return 1;
+    }
+
+    printf("ME device found: %s\n", DEV_NAME);
+
+    return 0;
+}
 
 int main(int argc, char *argv[])
 {
@@ -34,7 +63,7 @@ int main(int argc, char *argv[])
 	int rc;
 	int i;
 	struct mei_connect_client_data meidata;
-
+	imeCheck(); //new IME device checker, auto-checks for ime device from array.
 	printf("Opening %s ... ",DEV_NAME);
 	fd = open(DEV_NAME, O_RDWR);
 	if (fd < 0) {
